@@ -23,24 +23,31 @@ defmodule Tennis.GameTest do
 
   describe "Game" do
     test "new/0 initializes correctly" do
-      assert Game.new() == {:regular, {0, 0}}
+      assert Game.new() == {0, 0}
     end
 
     test "next_state/2 increments scores correctly" do
-      Enum.each([0, 15, 30], fn score ->
-        assert Game.next_state({:regular, {0, score}}, :p1) == {:regular, {15, score}}
-        assert Game.next_state({:regular, {15, score}}, :p1) == {:regular, {30, score}}
-        assert Game.next_state({:regular, {30, score}}, :p1) == {:regular, {40, score}}
+      Enum.each([0, 1, 2], fn score ->
+        assert Game.next_state({0, score}, :p1) == {1, score}
+        assert Game.next_state({1, score}, :p1) == {2, score}
+        assert Game.next_state({2, score}, :p1) == {3, score}
 
-        assert Game.next_state({:regular, {score, 0}}, :p2) == {:regular, {score, 15}}
-        assert Game.next_state({:regular, {score, 15}}, :p2) == {:regular, {score, 30}}
-        assert Game.next_state({:regular, {score, 30}}, :p2) == {:regular, {score, 40}}
+        assert Game.next_state({score, 0}, :p2) == {score, 1}
+        assert Game.next_state({score, 1}, :p2) == {score, 2}
+        assert Game.next_state({score, 2}, :p2) == {score, 3}
+      end)
+    end
+
+    test "next_state/2 wins non-deuce games correctly" do
+      Enum.each([0, 1, 2], fn score ->
+        assert Game.next_state({3, score}, :p1) == {:win, :p1}
+        assert Game.next_state({score, 3}, :p2) == {:win, :p2}
       end)
     end
 
     test "next_state/2 enters deuce states correctly" do
-      assert Game.next_state({:regular, {30, 40}}, :p1) == {:deuce, Deuce.new()}
-      assert Game.next_state({:regular, {40, 30}}, :p2) == {:deuce, Deuce.new()}
+      assert Game.next_state({2, 3}, :p1) == {:deuce, Deuce.new()}
+      assert Game.next_state({3, 2}, :p2) == {:deuce, Deuce.new()}
     end
 
     test "next_state/2 transitions through deuce states correctly" do

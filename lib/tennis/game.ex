@@ -19,20 +19,17 @@ defmodule Tennis.Game do
     def next_state(:"40-ad", :p2), do: {:win, :p2}
   end
 
-  @type score() :: 0 | 15 | 30 | 40
-  # TODO: except 40-40
-  @type regular_state() :: {:regular, {score(), score()}}
-  @type deuce_state() :: {:deuce, Deuce.state()}
-  @type state() :: regular_state() | deuce_state()
-  @type initial_state() :: {:regular, {0, 0}}
+  @type score() :: 0..3
+  # TODO: except {3, 3}
+  @type state() :: {score(), score()} | {:deuce, Deuce.state()}
+  @type initial_state() :: {0, 0}
   @type player() :: :p1 | :p2
 
   @spec new() :: initial_state()
-  def new, do: {:regular, {0, 0}}
+  def new, do: {0, 0}
 
   @spec next_state(state(), player()) :: state() | {:win, player()}
 
-  # TODO: I don't totally like this...wish I could send through directly
   def next_state({:deuce, deuce_state}, player) do
     case Deuce.next_state(deuce_state, player) do
       {:win, winner} -> {:win, winner}
@@ -40,16 +37,15 @@ defmodule Tennis.Game do
     end
   end
 
-  def next_state({:regular, {30, 40}}, :p1), do: {:deuce, Deuce.new()}
-  def next_state({:regular, {40, 30}}, :p2), do: {:deuce, Deuce.new()}
+  # deuce entry states
+  def next_state({2, 3}, :p1), do: {:deuce, Deuce.new()}
+  def next_state({3, 2}, :p2), do: {:deuce, Deuce.new()}
 
-  def next_state({:regular, {0, p2}}, :p1), do: {:regular, {15, p2}}
-  def next_state({:regular, {15, p2}}, :p1), do: {:regular, {30, p2}}
-  def next_state({:regular, {30, p2}}, :p1), do: {:regular, {40, p2}}
-  def next_state({:regular, {40, _p2}}, :p1), do: {:win, :p1}
+  # win states
+  def next_state({3, _p2}, :p1), do: {:win, :p1}
+  def next_state({_p1, 3}, :p2), do: {:win, :p2}
 
-  def next_state({:regular, {p1, 0}}, :p2), do: {:regular, {p1, 15}}
-  def next_state({:regular, {p1, 15}}, :p2), do: {:regular, {p1, 30}}
-  def next_state({:regular, {p1, 30}}, :p2), do: {:regular, {p1, 40}}
-  def next_state({:regular, {_p1, 40}}, :p2), do: {:win, :p2}
+  # point increment states
+  def next_state({p1, p2}, :p1), do: {p1 + 1, p2}
+  def next_state({p1, p2}, :p2), do: {p1, p2 + 1}
 end
