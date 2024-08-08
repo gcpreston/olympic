@@ -1,3 +1,2 @@
 defmodule Tennis do
-  
 end

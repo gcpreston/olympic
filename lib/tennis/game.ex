@@ -20,12 +20,14 @@ defmodule Tennis.Game do
   end
 
   @type score() :: 0 | 15 | 30 | 40
-  @type regular_state() :: {:regular, {score(), score()}} # TODO: except 40-40
+  # TODO: except 40-40
+  @type regular_state() :: {:regular, {score(), score()}}
   @type deuce_state() :: {:deuce, Deuce.state()}
   @type state() :: regular_state() | deuce_state()
+  @type initial_state() :: {:regular, {0, 0}}
   @type player() :: :p1 | :p2
 
-  @spec new() :: {:regular, {0, 0}}
+  @spec new() :: initial_state()
   def new, do: {:regular, {0, 0}}
 
   @spec next_state(state(), player()) :: state() | {:win, player()}
@@ -33,7 +35,7 @@ defmodule Tennis.Game do
   # TODO: I don't totally like this...wish I could send through directly
   def next_state({:deuce, deuce_state}, player) do
     case Deuce.next_state(deuce_state, player) do
-      {:win, p} -> {:win, p}
+      {:win, winner} -> {:win, winner}
       new_deuce_state -> {:deuce, new_deuce_state}
     end
   end
