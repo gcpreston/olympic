@@ -32,9 +32,14 @@ defmodule Tennis.Game do
     opponent_score = Enum.at(scores, opponent)
 
     cond do
-      winner_new_score == @winning_score && winner_new_score - opponent_score >= @win_differential -> {:win, point_winner}
-      winner_new_score == @winning_score - 1 && opponent_score == @winning_score - 1 -> {:deuce, Deuce.new()}
-      true -> new_scores
+      winner_new_score == @winning_score && winner_new_score - opponent_score >= @win_differential ->
+        {:win, point_winner}
+
+      winner_new_score == @winning_score - 1 && opponent_score == @winning_score - 1 ->
+        {:deuce, Deuce.new()}
+
+      true ->
+        new_scores
     end
   end
 end
