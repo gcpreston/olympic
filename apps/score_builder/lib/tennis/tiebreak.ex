@@ -3,12 +3,11 @@ defmodule Tennis.Tiebreak do
   # TODO: Exactly 2 elements
   @type state() :: [score()]
   @type initial_state() :: {0, 0}
-  @type player() :: 0..1
 
   @spec new() :: initial_state()
   def new, do: [0, 0]
 
-  @spec next_state(state(), player()) :: state() | {:win, player()}
+  @spec next_state(state(), Tennis.player()) :: state() | {:win, Tennis.player()}
   def next_state(scores, point_winner) do
     winner_new_score = Enum.at(scores, point_winner) + 1
     new_scores = List.replace_at(scores, point_winner, winner_new_score)
